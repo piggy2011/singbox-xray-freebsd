@@ -1,0 +1,38 @@
+name: Build FreeBSD Proxies v1.0 (FreeBSD 14.1 amd64)
+
+on:
+  workflow_dispatch:
+
+env:
+  SINGBOX_TAG: "v1.12.12"
+  XRAY_TAG: "v25.10.15"
+  GO_VERSION: "1.23.1"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Make script executable
+        run: chmod +x build-proxies-freebsd.sh
+
+      - name: Run FreeBSD build script
+        run: ./build-proxies-freebsd.sh
+
+      - name: Generate archive and checksums
+        run: |
+          cd ~/build-proxies-freebsd/output
+          sha256sum sing-box-freebsd-amd64 xray-freebsd-amd64 > SHA256SUMS.txt
+          DATE=$(date +'%Y%m%d_%H%M%S')
+          tar -czf proxies_freebsd_${DATE}.tar.gz sing-box-freebsd-amd64 xray-freebsd-amd64 SHA256SUMS.txt
+          ls -lh proxies_freebsd_${DATE}.tar.gz SHA256SUMS.txt
+
+      - name: Upload compiled artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: proxies-freebsd-archive
+          path: |
+            ~/build-proxies-freebsd/output/proxies_freebsd_*.tar.gz
+            ~/build-proxies-freebsd/output/SHA256SUMS.txt
