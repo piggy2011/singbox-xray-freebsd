@@ -47,6 +47,7 @@ fi
 
 # FreeBSD amd64 构建
 GOOS=freebsd GOARCH=amd64 CGO_ENABLED=0 go build -trimpath \
+  -tags "with_quic with_utls with_dhcp with_reality_server with_clash_api with_gvisor" \
   -ldflags="-s -w -buildid= -X github.com/sagernet/sing-box/constant.Version=${SINGBOX_TAG}" \
   -o "${OUTPUT_DIR}/sing-box-freebsd-amd64" ./cmd/sing-box
 
